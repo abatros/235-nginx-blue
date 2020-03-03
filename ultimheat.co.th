@@ -1,0 +1,120 @@
+########################
+### ULTIMHEAT.CO.TH  ###
+########################
+
+
+server { ## listen for ipv4; this line is default and implied
+   server_name ultimheat.co.th www.ultimheat.co.th;
+   # root /home/dkz/tmp/git-u7/blueink;
+   # root /www/224-co.th/www;
+   root /www/ultimheat.co.th; # soft link to ultimheat5.co.th
+   # root /www/design.eglogics.website;
+   index index.html;
+   autoindex on;
+
+   #location ~* \.pdf$ {
+   #   limit_req zone=pdf_zone burst=5;
+   #   }
+
+
+   location / {
+      # First attempt to serve request as file, then
+      # as directory, then fall back to index.html
+      try_files $uri $uri.html $uri/ =404;
+      # Uncomment to enable naxsi on this location
+      # include /etc/nginx/naxsi.rules
+      }
+
+   location /diva/ {
+     alias /www/eglogics/design.eglogics.website/ultimheat/;
+     autoindex on;
+     try_files $uri $uri/ =404;
+   }
+
+   location /diva2/ {
+     alias /www/design.eglogics.website/ultimheat/;
+     autoindex on;
+     try_files $uri $uri/ =404;
+   }
+
+
+   location /diva3/ {
+     alias /www/diva3/;
+     autoindex on;
+     try_files $uri $uri/ =404;
+   }
+
+
+ location /api {
+    proxy_pass http://127.0.0.1:32031;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    # proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header X-Forwarded-For $remote_addr; # preserve client IP
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+
+
+
+location /editora {
+
+#    rewrite ^/editora(.*) /$1 break;
+    proxy_pass http://127.0.0.1:32046/editora;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    # proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header X-Forwarded-For $remote_addr; # preserve client IP
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+
+
+        location /testproxy {
+      add_header X-uri-dkz "Hello Article-$1";
+      #proxy_pass http://127.0.0.1:32020/museum-app/xp/article/$1;
+      proxy_pass http://127.0.0.1:32044/testproxy;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection 'upgrade';
+      proxy_set_header X-Forwarded-For $remote_addr; # preserve client IP
+      proxy_set_header X-Real-IP $remote_addr;
+
+
+}
+
+
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/ultimheat.co.th/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/ultimheat.co.th/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+
+
+
+
+
+
+server {
+    if ($host = ultimheat.co.th) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+   if ($host = www.ultimheat.co.th) {
+     return 301 https://$host$request_uri;
+   }
+
+
+   listen 80;
+   listen [::]:80;
+   server_name ultimheat.co.th www.ultimheat.co.th;
+    return 404; # managed by Certbot
+
+
+}
